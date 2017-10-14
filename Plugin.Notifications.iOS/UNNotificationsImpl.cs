@@ -36,8 +36,24 @@ namespace Plugin.Notifications
                 Title = notification.Title,
                 Body = notification.Message
             };
-            if (!String.IsNullOrWhiteSpace(notification.Sound))
+
+            if (string.IsNullOrEmpty(notification.Sound))
+            {
+                if (!string.IsNullOrEmpty(Notification.DefaultSound))
+                {
+                    notification.Sound = Notification.DefaultSound;
+                    content.Sound = UNNotificationSound.GetSound(notification.Sound);
+                }
+                else if (Notification.SystemSoundFallback)
+                {
+                    // untested
+                    content.Sound = UNNotificationSound.Default;
+                }
+            }
+            else
+            {
                 content.Sound = UNNotificationSound.GetSound(notification.Sound);
+            }
 
             var dt = notification.SendTime;
             var request = UNNotificationRequest.FromIdentifier(

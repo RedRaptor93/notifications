@@ -43,9 +43,18 @@ namespace Plugin.Notifications
 
             notification.Metadata.Add(NOTIFICATION_ID_KEY, notification.Id.ToString());
 
+            if (string.IsNullOrEmpty(notification.Sound))
+            {
+                if (!String.IsNullOrEmpty(Notification.DefaultSound))
+                    notification.Sound = Notification.DefaultSound;
+
+                else if (Notification.SystemSoundFallback)
+                    notification.Sound = UILocalNotification.DefaultSoundName;
+            }
+
             var not = new UILocalNotification
             {
-                FireDate = notification.SendTime.ToNSDate(),
+                FireDate = notification.SendTime.ToNSDate(), 
                 AlertTitle = notification.Title,
                 AlertBody = notification.Message,
                 SoundName = notification.Sound,

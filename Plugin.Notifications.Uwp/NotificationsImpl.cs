@@ -81,6 +81,11 @@ namespace Plugin.Notifications
                     }
                 }
             };
+
+            if (string.IsNullOrWhiteSpace(notification.Sound))
+            {
+                notification.Sound = Notification.DefaultSound;
+            }
             if (!String.IsNullOrWhiteSpace(notification.Sound) && this.IsAudioSupported)
             {
                 if (!notification.Sound.StartsWith("ms-appx:"))

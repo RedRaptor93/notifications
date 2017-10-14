@@ -38,6 +38,19 @@ namespace Plugin.Notifications
             if (notification.Id == null)
                 notification.GeneratedNotificationId();
 
+            // untested
+            if (string.IsNullOrEmpty(notification.Sound))
+            {
+                if (!string.IsNullOrEmpty(Notification.DefaultSound))
+                {
+                    notification.Sound = Notification.DefaultSound;
+                }
+                else if (Notification.SystemSoundFallback)
+                {
+                    notification.Sound = NSUserNotification.NSUserNotificationDefaultSoundName;
+                }
+            }
+
             var native = new NSUserNotification
             {
                 Identifier = notification.Id.Value.ToString(),

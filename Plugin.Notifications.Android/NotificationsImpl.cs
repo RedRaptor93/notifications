@@ -5,20 +5,16 @@ using Android.App;
 using Android.Content;
 using Android.OS;
 using Android.Support.V4.App;
-
+using Android.Media;
 
 namespace Plugin.Notifications
 {
+    using DroidURI = Android.Net.Uri;
+    using Debug = System.Diagnostics.Debug;
+
     public class NotificationsImpl : AbstractNotificationsImpl
     {
         readonly AlarmManager alarmManager;
-        public static int AppIconResourceId { get; set; }
-
-
-        static NotificationsImpl()
-        {
-            AppIconResourceId = Application.Context.Resources.GetIdentifier("icon", "drawable", Application.Context.PackageName);
-        }
 
 
         public NotificationsImpl()
@@ -35,6 +31,12 @@ namespace Plugin.Notifications
                 notification.Id = Services.Repository.CurrentScheduleId;
             }
 
+            if (string.IsNullOrEmpty(notification.IconName))
+            {
+                notification.IconName = Notification.DefaultIcon;
+            }
+
+
             if (notification.IsScheduled)
             {
                 var triggerMs = this.GetEpochMills(notification.SendTime);
@@ -49,6 +51,7 @@ namespace Plugin.Notifications
             }
             else
             {
+                var iconResourceId = Application.Context.Resources.GetIdentifier(notification.IconName, "drawable", Application.Context.PackageName);
                 var launchIntent = Application.Context.PackageManager.GetLaunchIntentForPackage(Application.Context.PackageName);
                 launchIntent.SetFlags(ActivityFlags.NewTask | ActivityFlags.ClearTask);
                 foreach (var pair in notification.Metadata)
@@ -56,11 +59,12 @@ namespace Plugin.Notifications
                     launchIntent.PutExtra(pair.Key, pair.Value);
                 }
 
+
                 var builder = new NotificationCompat.Builder(Application.Context)
                     .SetAutoCancel(true)
                     .SetContentTitle(notification.Title)
                     .SetContentText(notification.Message)
-                    .SetSmallIcon(AppIconResourceId)
+                    .SetSmallIcon(iconResourceId)
                     .SetContentIntent(TaskStackBuilder
                         .Create(Application.Context)
                         .AddNextIntent(launchIntent)
@@ -72,15 +76,29 @@ namespace Plugin.Notifications
                     builder.SetVibrate(new long[] {500, 500});
                 }
 
+                // Sound
+                if (string.IsNullOrEmpty(notification.Sound))
+                {
+                    notification.Sound = Notification.DefaultSound;
+                }
                 if (notification.Sound != null)
                 {
                     if (!notification.Sound.Contains("://"))
                     {
                         notification.Sound = $"{ContentResolver.SchemeAndroidResource}://{Application.Context.PackageName}/raw/{notification.Sound}";
                     }
-                    var uri = Android.Net.Uri.Parse(notification.Sound);
-                    builder.SetSound(uri);
+
+                    var soundUri = DroidURI.Parse(notification.Sound);
+                    builder.SetSound(soundUri);
                 }
+                else if (Notification.SystemSoundFallback)
+                {
+                    // Fallback to the system default notification sound
+                    // if both Sound prop and Default prop are null
+                    var soundUri = RingtoneManager.GetDefaultUri(RingtoneType.Notification);
+                    builder.SetSound(soundUri);
+                }
+
                 var not = builder.Build();
                 NotificationManagerCompat
                     .From(Application.Context)
@@ -88,7 +106,6 @@ namespace Plugin.Notifications
             }
             return Task.CompletedTask;
         }
-
 
         public override Task CancelAll()
         {

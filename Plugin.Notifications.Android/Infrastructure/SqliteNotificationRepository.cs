@@ -42,6 +42,7 @@ namespace Plugin.Notifications.Infrastructure
                 Sound = db.Sound,
                 Vibrate = db.Vibrate,
                 Date = db.DateScheduled,
+                IconName = db.IconName,
                 Metadata = mds
                     .ToDictionary(
                         y => y.Key,
@@ -63,6 +64,7 @@ namespace Plugin.Notifications.Infrastructure
                 Sound = x.Sound,
                 Vibrate = x.Vibrate,
                 Date = x.DateScheduled,
+                IconName = x.IconName,
                 Metadata = mds
                     .Where(y => y.NotificationId == x.Id)
                     .ToDictionary(
@@ -85,6 +87,7 @@ namespace Plugin.Notifications.Infrastructure
                     Title = notification.Title,
                     Message = notification.Message,
                     Sound = notification.Sound,
+                    IconName = notification.IconName,
                     Vibrate = notification.Vibrate,
                     DateScheduled = notification.SendTime
                 };
