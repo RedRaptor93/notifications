@@ -10,14 +10,14 @@ namespace Plugin.Notifications
         public static bool SystemSoundFallback { get; set; } = true;
         public static string DefaultTitle { get; set; }
         public static string DefaultSound { get; set; }
-        public static string DefaultIcon { get; set; } = "icon";
+        //public static string DefaultIcon { get; set; } = "icon";
 
 
         public int? Id { get; set; }
         public string Title { get; set; } = DefaultTitle;
         public string Message { get; set; }
         public string Sound { get; set; } = DefaultSound;
-        public string IconName { get; set; } = DefaultIcon;
+        public string IconName { get; set; }
 
         public IDictionary<string, string> Metadata { get; set; } = new Dictionary<string, string>();
 

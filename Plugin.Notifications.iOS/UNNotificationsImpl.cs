@@ -34,7 +34,8 @@ namespace Plugin.Notifications
             var content = new UNMutableNotificationContent
             {
                 Title = notification.Title,
-                Body = notification.Message
+                Body = notification.Message,
+                LaunchImageName = notification.IconName
             };
 
             if (string.IsNullOrEmpty(notification.Sound))

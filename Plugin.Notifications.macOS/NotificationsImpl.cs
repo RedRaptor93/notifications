@@ -65,7 +65,6 @@ namespace Plugin.Notifications
                 .ScheduleNotification(native);
         });
 
-
         public override async Task<int> GetBadge()
         {
             var tcs = new TaskCompletionSource<int>();

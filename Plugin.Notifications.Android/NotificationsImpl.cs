@@ -31,10 +31,10 @@ namespace Plugin.Notifications
                 notification.Id = Services.Repository.CurrentScheduleId;
             }
 
-            if (string.IsNullOrEmpty(notification.IconName))
-            {
-                notification.IconName = Notification.DefaultIcon;
-            }
+            //if (string.IsNullOrEmpty(notification.IconName))
+            //{
+            //    notification.IconName = Notification.DefaultIcon;
+            //}
 
 
             if (notification.IsScheduled)

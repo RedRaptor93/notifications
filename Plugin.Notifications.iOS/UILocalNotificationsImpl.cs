@@ -52,12 +52,18 @@ namespace Plugin.Notifications
                     notification.Sound = UILocalNotification.DefaultSoundName;
             }
 
+            //if (string.IsNullOrEmpty(notification.IconName))
+            //{
+            //    notification.IconName = Notification.DefaultIcon;
+            //}
+
             var not = new UILocalNotification
             {
                 FireDate = notification.SendTime.ToNSDate(), 
                 AlertTitle = notification.Title,
                 AlertBody = notification.Message,
                 SoundName = notification.Sound,
+                AlertLaunchImage = notification.IconName,
                 UserInfo = notification.Metadata.ToNsDictionary()
             };
             return this.Invoke(() => UIApplication.SharedApplication.ScheduleLocalNotification(not));
