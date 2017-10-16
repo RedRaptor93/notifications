@@ -18,10 +18,11 @@ namespace Samples
             btnTestNotifDefIcon, btnTestNotifCustomIcon,
             btnMultipleMsgs, btnCancelAll, btnVibrate;
 
-        Label lblTestNotif, lblBadges, lblSep;
+        Label lblTestNotif, lblBadges, lblOthers;
 
         private void InitComponents()
         {
+            // init components
             root = new ScrollView();
 
             btnPermission = new Button
@@ -78,7 +79,7 @@ namespace Samples
                         IconName = "ic_addcard"
                     }))
             };
-            lblSep = new Label
+            lblOthers = new Label
             {
                 Text = SEP + "  Others  " + SEP,
                 HorizontalOptions = LayoutOptions.Center
@@ -116,6 +117,7 @@ namespace Samples
                 Command = new Command(() => CrossNotifications.Current.Vibrate())
             };
 
+            // set layout
             layout = new StackLayout
             {
                 VerticalOptions = LayoutOptions.FillAndExpand,
@@ -129,14 +131,15 @@ namespace Samples
                     lblTestNotif,
                     btnTestNotifDefIcon,
                     btnTestNotifCustomIcon,
-                    lblSep,
+                    lblOthers,
                     btnMultipleMsgs,
                     btnCancelAll,
                     btnVibrate
                 }
             };
-
             root.Content = layout;
+
+            // set content to root
             this.Content = root;
         } 
 
@@ -146,7 +149,6 @@ namespace Samples
             InitComponents();
             Title = "Notifications";
             Notification.DefaultTitle = "Test Title";
-
         }
 
     }

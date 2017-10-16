@@ -10,7 +10,6 @@ using Android.Media;
 namespace Plugin.Notifications
 {
     using DroidURI = Android.Net.Uri;
-    using Debug = System.Diagnostics.Debug;
 
     public class NotificationsImpl : AbstractNotificationsImpl
     {
@@ -30,12 +29,6 @@ namespace Plugin.Notifications
                 Services.Repository.CurrentScheduleId++;
                 notification.Id = Services.Repository.CurrentScheduleId;
             }
-
-            //if (string.IsNullOrEmpty(notification.IconName))
-            //{
-            //    notification.IconName = Notification.DefaultIcon;
-            //}
-
 
             if (notification.IsScheduled)
             {

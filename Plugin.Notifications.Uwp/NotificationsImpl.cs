@@ -76,11 +76,19 @@ namespace Plugin.Notifications
                             new AdaptiveText
                             {
                                 Text = notification.Message
-                            }
-                        }
+                            },
+                        },
                     }
                 }
             };
+
+            if (!string.IsNullOrWhiteSpace(notification.IconName))
+            {
+                toastContent.Visual.BindingGeneric.AppLogoOverride = new ToastGenericAppLogo
+                {
+                    Source = notification.IconName.GetAssetsPath() + ".png"
+                };
+            }
 
             if (string.IsNullOrWhiteSpace(notification.Sound))
             {
@@ -88,12 +96,9 @@ namespace Plugin.Notifications
             }
             if (!String.IsNullOrWhiteSpace(notification.Sound) && this.IsAudioSupported)
             {
-                if (!notification.Sound.StartsWith("ms-appx:"))
-                    notification.Sound = $"ms-appx:///Assets/Audio/{notification.Sound}.m4a";
-
                 toastContent.Audio = new ToastAudio
                 {
-                    Src = new Uri(notification.Sound)
+                    Src = new Uri(notification.Sound.GetAssetsAudioPath() + ".m4a")
                 };
             }
 
