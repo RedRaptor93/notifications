@@ -26396,38 +26396,37 @@
     "UAP,Version=v10.0.10240": []
   },
   "packageFolders": {
-    "C:\\Users\\allan\\.nuget\\packages\\": {}
+    "C:\\Users\\Pedro\\.nuget\\packages\\": {}
   },
   "project": {
     "restore": {
-      "projectUniqueName": "C:\\dev\\acr\\notifications\\Samples\\Samples.Uwp\\Samples.Uwp.csproj",
+      "projectUniqueName": "C:\\Users\\Pedro\\Source\\Repos\\acr_notifications\\Samples\\Samples.Uwp\\Samples.Uwp.csproj",
       "projectName": "Samples.Uwp",
-      "projectPath": "C:\\dev\\acr\\notifications\\Samples\\Samples.Uwp\\Samples.Uwp.csproj",
-      "projectJsonPath": "C:\\dev\\acr\\notifications\\Samples\\Samples.Uwp\\project.json",
-      "packagesPath": "C:\\Users\\allan\\.nuget\\packages\\",
-      "outputPath": "C:\\dev\\acr\\notifications\\Samples\\Samples.Uwp\\obj\\",
+      "projectPath": "C:\\Users\\Pedro\\Source\\Repos\\acr_notifications\\Samples\\Samples.Uwp\\Samples.Uwp.csproj",
+      "projectJsonPath": "C:\\Users\\Pedro\\Source\\Repos\\acr_notifications\\Samples\\Samples.Uwp\\project.json",
+      "packagesPath": "C:\\Users\\Pedro\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\Pedro\\Source\\Repos\\acr_notifications\\Samples\\Samples.Uwp\\obj\\",
       "projectStyle": "ProjectJson",
       "configFilePaths": [
-        "C:\\Users\\allan\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\Pedro\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "sources": {
         "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-        "C:\\Users\\allan\\Dropbox\\nuget": {},
         "https://api.nuget.org/v3/index.json": {},
-        "https://www.myget.org/F/signalr-alpha/api/v3/index.json": {}
+        "https://www.myget.org/F/prism/api/v3/index.json": {}
       },
       "frameworks": {
         "uap10.0.10240": {
           "projectReferences": {
-            "C:\\dev\\acr\\notifications\\Plugin.Notifications.Abstractions\\Plugin.Notifications.Abstractions.csproj": {
-              "projectPath": "C:\\dev\\acr\\notifications\\Plugin.Notifications.Abstractions\\Plugin.Notifications.Abstractions.csproj"
+            "C:\\Users\\Pedro\\Source\\Repos\\acr_notifications\\Plugin.Notifications.Abstractions\\Plugin.Notifications.Abstractions.csproj": {
+              "projectPath": "C:\\Users\\Pedro\\Source\\Repos\\acr_notifications\\Plugin.Notifications.Abstractions\\Plugin.Notifications.Abstractions.csproj"
             },
-            "C:\\dev\\acr\\notifications\\Plugin.Notifications.Uwp\\Plugin.Notifications.Uwp.csproj": {
-              "projectPath": "C:\\dev\\acr\\notifications\\Plugin.Notifications.Uwp\\Plugin.Notifications.Uwp.csproj"
+            "C:\\Users\\Pedro\\Source\\Repos\\acr_notifications\\Plugin.Notifications.Uwp\\Plugin.Notifications.Uwp.csproj": {
+              "projectPath": "C:\\Users\\Pedro\\Source\\Repos\\acr_notifications\\Plugin.Notifications.Uwp\\Plugin.Notifications.Uwp.csproj"
             },
-            "C:\\dev\\acr\\notifications\\Samples\\Samples.Core\\Samples.Core.csproj": {
-              "projectPath": "C:\\dev\\acr\\notifications\\Samples\\Samples.Core\\Samples.Core.csproj"
+            "C:\\Users\\Pedro\\Source\\Repos\\acr_notifications\\Samples\\Samples.Core\\Samples.Core.csproj": {
+              "projectPath": "C:\\Users\\Pedro\\Source\\Repos\\acr_notifications\\Samples\\Samples.Core\\Samples.Core.csproj"
             }
           }
         }
