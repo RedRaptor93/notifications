@@ -43,6 +43,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AndroidConfig.cs" />
     <Compile Include="Infrastructure\AcrSqliteConnection.cs" />
     <Compile Include="AlarmBroadcastReceiver.cs" />
     <Compile Include="Infrastructure\DbNotification.cs" />
@@ -53,7 +54,6 @@
     <Compile Include="INotificationRepository.cs" />
     <Compile Include="NotificationsImpl.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Services.cs" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="NETStandard.Library">
