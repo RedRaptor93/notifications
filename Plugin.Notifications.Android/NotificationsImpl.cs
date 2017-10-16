@@ -9,9 +9,8 @@ using Android.Media;
 
 namespace Plugin.Notifications
 {
-    using DroidURI = Android.Net.Uri;
-
-    public class NotificationsImpl : AbstractNotificationsImpl
+    //https://stackoverflow.com/questions/6422319/start-service-from-notification
+    public class NotificationsImpl : AbstractNotificationsImpl, IAndroidNotificationReceiver
     {
         readonly AlarmManager alarmManager;
 
@@ -26,8 +25,8 @@ namespace Plugin.Notifications
         {
             if (notification.Id == null)
             {
-                Services.Repository.CurrentScheduleId++;
-                notification.Id = Services.Repository.CurrentScheduleId;
+                AndroidConfig.Repository.CurrentScheduleId++;
+                notification.Id = AndroidConfig.Repository.CurrentScheduleId;
             }
 
             if (notification.IsScheduled)
@@ -40,13 +39,19 @@ namespace Plugin.Notifications
                     Convert.ToInt64(triggerMs),
                     pending
                 );
-                Services.Repository.Insert(notification);
+                AndroidConfig.Repository.Insert(notification);
             }
             else
             {
-                var iconResourceId = Application.Context.Resources.GetIdentifier(notification.IconName, "drawable", Application.Context.PackageName);
-                var launchIntent = Application.Context.PackageManager.GetLaunchIntentForPackage(Application.Context.PackageName);
-                launchIntent.SetFlags(ActivityFlags.NewTask | ActivityFlags.ClearTask);
+                var iconResourceId = AndroidConfig.GetResourceIdByName(notification.IconName);
+                var launchIntent = new Intent(Application.Context, typeof(NotificationActionService));
+                launchIntent.PutExtra(Constants.ACTION_KEY, "0");
+                //var launchIntent = Application
+                //    .Context
+                //    .PackageManager
+                //    .GetLaunchIntentForPackage(Application.Context.PackageName);
+                //launchIntent.SetFlags(ActivityFlags.NewTask | ActivityFlags.ClearTask);
+
                 foreach (var pair in notification.Metadata)
                 {
                     launchIntent.PutExtra(pair.Key, pair.Value);
@@ -81,7 +86,7 @@ namespace Plugin.Notifications
                         notification.Sound = $"{ContentResolver.SchemeAndroidResource}://{Application.Context.PackageName}/raw/{notification.Sound}";
                     }
 
-                    var soundUri = DroidURI.Parse(notification.Sound);
+                    var soundUri = Android.Net.Uri.Parse(notification.Sound);
                     builder.SetSound(soundUri);
                 }
                 else if (Notification.SystemSoundFallback)
@@ -102,11 +107,11 @@ namespace Plugin.Notifications
 
         public override Task CancelAll()
         {
-            var notifications = Services.Repository.GetScheduled();
+            var notifications = AndroidConfig.Repository.GetScheduled();
             foreach (var notification in notifications)
                 this.CancelInternal(notification.Id.Value);
 
-            Services.Repository.DeleteAll();
+            AndroidConfig.Repository.DeleteAll();
 
             NotificationManagerCompat
                 .From(Application.Context)
@@ -118,22 +123,23 @@ namespace Plugin.Notifications
 
         public override Task Cancel(int notificationId)
         {
+            AndroidConfig.Repository.Delete(notificationId);
             this.CancelInternal(notificationId);
             return Task.FromResult(true);
         }
 
 
         public override Task<IEnumerable<Notification>> GetScheduledNotifications()
-            => Task.FromResult(Services.Repository.GetScheduled());
+            => Task.FromResult(AndroidConfig.Repository.GetScheduled());
 
 
         public override Task<bool> RequestPermission() => Task.FromResult(true);
-        public override Task<int> GetBadge() => Task.FromResult(Services.Repository.CurrentBadge);
+        public override Task<int> GetBadge() => Task.FromResult(AndroidConfig.Repository.CurrentBadge);
         public override Task SetBadge(int value)
         {
             try
             {
-                Services.Repository.CurrentBadge = value;
+                AndroidConfig.Repository.CurrentBadge = value;
                 if (value <= 0)
                 {
                     ME.Leolin.Shortcutbadger.ShortcutBadger.RemoveCount(Application.Context);
@@ -161,6 +167,28 @@ namespace Plugin.Notifications
             }
         }
 
+
+        public void TriggerNotification(int id)
+        {
+            var notification = AndroidConfig.Repository.GetById(id);
+            if (notification != null)
+                this.OnActivated(notification);
+        }
+
+
+        public void TriggerScheduledNotification(int notificationId)
+        {
+            var notification = AndroidConfig.Repository.GetById(notificationId);
+            if (notification == null)
+                return;
+
+            AndroidConfig.Repository.Delete(notificationId);
+
+            // resend without schedule so it goes through normal mechanism
+            notification.When = null;
+            notification.Date = null;
+            this.Send(notification);
+        }
 
         protected virtual long GetEpochMills(DateTime sendTime)
         {

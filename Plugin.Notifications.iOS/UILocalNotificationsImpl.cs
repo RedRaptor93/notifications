@@ -11,6 +11,23 @@ namespace Plugin.Notifications
     public class UILocalNotificationsImpl : AbstractAppleNotificationsImpl
     {
         const string NOTIFICATION_ID_KEY = "NotificationID";
+        readonly IDisposable dispose;
+
+
+        public UILocalNotificationsImpl()
+        {
+            this.dispose = UIApplication
+                .Notifications
+                .ObserveDidFinishLaunching((sender, launchArgs) =>
+                {
+                    var native = launchArgs.Notification.Object as UILocalNotification;
+                    if (native != null)
+                    {
+                        var notification = this.FromNative(native);
+                        this.OnActivated(notification);
+                    }
+                });
+        }
 
 
         public override Task Cancel(int notificationId)
@@ -52,10 +69,6 @@ namespace Plugin.Notifications
                     notification.Sound = UILocalNotification.DefaultSoundName;
             }
 
-            //if (string.IsNullOrEmpty(notification.IconName))
-            //{
-            //    notification.IconName = Notification.DefaultIcon;
-            //}
 
             var not = new UILocalNotification
             {
@@ -64,7 +77,7 @@ namespace Plugin.Notifications
                 AlertBody = notification.Message,
                 SoundName = notification.Sound,
                 AlertLaunchImage = notification.IconName,
-                UserInfo = notification.Metadata.ToNsDictionary()
+                UserInfo = notification.MetadataToNsDictionary()
             };
             return this.Invoke(() => UIApplication.SharedApplication.ScheduleLocalNotification(not));
         }
@@ -112,6 +125,13 @@ namespace Plugin.Notifications
             }
 
             return plugin;
+        }
+
+
+        protected override void Dispose(bool disposing)
+        {
+            base.Dispose(disposing);
+            this.dispose.Dispose();
         }
     }
 }

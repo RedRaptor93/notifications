@@ -11,6 +11,18 @@ namespace Plugin.Notifications
 {
     public class UNNotificationsImpl : AbstractAppleNotificationsImpl
     {
+        public UNNotificationsImpl()
+        {
+            UNUserNotificationCenter
+                .Current
+                .Delegate = new AcrUserNotificationCenterDelegate(response =>
+                {
+                    var notification = this.FromNative(response.Notification.Request);
+                    this.OnActivated(notification);
+                });
+        }
+
+
         public override Task CancelAll() => this.Invoke(() =>
         {
             UNUserNotificationCenter.Current.RemoveAllPendingNotificationRequests();
@@ -21,6 +33,7 @@ namespace Plugin.Notifications
         public override Task Cancel(int notificationId) => this.Invoke(() =>
         {
             var ids = new [] { notificationId.ToString() };
+
             UNUserNotificationCenter.Current.RemovePendingNotificationRequests(ids);
             UNUserNotificationCenter.Current.RemoveDeliveredNotifications(ids);
         });
@@ -36,6 +49,7 @@ namespace Plugin.Notifications
                 Title = notification.Title,
                 Body = notification.Message,
                 LaunchImageName = notification.IconName
+                UserInfo = notification.MetadataToNsDictionary()
             };
 
             if (string.IsNullOrEmpty(notification.Sound))
@@ -79,8 +93,10 @@ namespace Plugin.Notifications
             var tcs = new TaskCompletionSource<IEnumerable<Notification>>();
             UIApplication.SharedApplication.InvokeOnMainThread(async () =>
             {
-                var requests = await UNUserNotificationCenter.Current.GetPendingNotificationRequestsAsync();
-                var notifications = requests.Select(x => new Notification());
+                var requests = await UNUserNotificationCenter
+                    .Current
+                    .GetPendingNotificationRequestsAsync();
+                var notifications = requests.Select(this.FromNative);
                 tcs.TrySetResult(notifications);
             });
             return tcs.Task;
@@ -94,7 +110,9 @@ namespace Plugin.Notifications
             //UNUserNotificationCenter.Current.Delegate.DidReceiveNotificationResponse();
             //UNUserNotificationCenter.Current.Delegate.WillPresentNotification();
             UNUserNotificationCenter.Current.RequestAuthorization(
-                UNAuthorizationOptions.Alert | UNAuthorizationOptions.Badge | UNAuthorizationOptions.Sound,
+                UNAuthorizationOptions.Alert |
+                UNAuthorizationOptions.Badge |
+                UNAuthorizationOptions.Sound,
                 (approved, error) => tcs.TrySetResult(approved)
             );
             return tcs.Task;
@@ -106,13 +124,20 @@ namespace Plugin.Notifications
             if (!Int32.TryParse(native.Identifier, out var i))
                 return null;
 
+            var date =
+                (native.Trigger as UNCalendarNotificationTrigger)?
+                    .DateComponents?
+                    .Date?
+                    .ToDateTime()
+                ?? DateTime.Now;
+
             var plugin = new Notification
             {
                 Id = i,
                 Title = native.Content.Title,
                 Message = native.Content.Body,
-                Sound = native.Content.Sound.ToString(),
-                Date = (native.Trigger as UNCalendarNotificationTrigger)?.NextTriggerDate.ToDateTime() ?? DateTime.MinValue,
+                Sound = native.Content.Sound?.ToString(),
+                Date = date,
                 Metadata = native.Content.UserInfo.FromNsDictionary()
             };
 
