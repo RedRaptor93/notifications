@@ -48,7 +48,7 @@ namespace Plugin.Notifications
             {
                 Title = notification.Title,
                 Body = notification.Message,
-                LaunchImageName = notification.IconName
+                LaunchImageName = notification.IconName,
                 UserInfo = notification.MetadataToNsDictionary()
             };
 

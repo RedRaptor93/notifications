@@ -20,8 +20,7 @@ namespace Plugin.Notifications
                 .Notifications
                 .ObserveDidFinishLaunching((sender, launchArgs) =>
                 {
-                    var native = launchArgs.Notification.Object as UILocalNotification;
-                    if (native != null)
+                    if (launchArgs.Notification.Object is UILocalNotification native)
                     {
                         var notification = this.FromNative(native);
                         this.OnActivated(notification);

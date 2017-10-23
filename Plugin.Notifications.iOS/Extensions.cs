@@ -8,6 +8,7 @@ namespace Plugin.Notifications
     public static class Extensions
     {
         static DateTime reference = new DateTime(2001, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
+        const string NOTIFICATION_ID_KEY = "notificationid";
 
 
         public static DateTime ToDateTime(this NSDate date)
@@ -44,7 +45,6 @@ namespace Plugin.Notifications
         }
 
 
-        const string NOTIFICATION_ID_KEY = "notificationid";
         static readonly object syncLock = new object();
         public static int GeneratedNotificationId(this Notification notification)
         {
