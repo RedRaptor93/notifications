@@ -43,7 +43,7 @@ namespace Plugin.Notifications
             }
             else
             {
-                var iconResourceId = AndroidConfig.GetResourceIdByName(notification.IconName);
+                var iconResourceId = AndroidConfig.GetResourceIdByName(notification.IconName ?? "icon");
                 var launchIntent = new Intent(Application.Context, typeof(NotificationActionService));
                 launchIntent.PutExtra(Constants.ACTION_KEY, "0");
                 //var launchIntent = Application
@@ -104,6 +104,7 @@ namespace Plugin.Notifications
             }
             return Task.CompletedTask;
         }
+
 
         public override Task CancelAll()
         {

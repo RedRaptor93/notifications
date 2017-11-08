@@ -16,7 +16,8 @@ namespace Samples
 
         Button btnPermission, btnSetBadge, btnClearBadge,
             btnTestNotifDefIcon, btnTestNotifCustomIcon,
-            btnMultipleMsgs, btnCancelAll, btnVibrate;
+            btnMultipleMsgs, btnCancelAll, btnVibrate,
+            btnTestNotifMetadata;
 
         Label lblTestNotif, lblBadges, lblOthers;
 
@@ -28,11 +29,7 @@ namespace Samples
             btnPermission = new Button
             {
                 Text = "Request Permission",
-                Command = new Command(async () =>
-                {
-                    var result = await CrossNotifications.Current.RequestPermission();
-                    btnPermission.Text = result ? "Permission Granted" : "Permission Denied";
-                })
+                Command = new Command(RequestPermission)
             };
             lblBadges = new Label
             {
@@ -42,12 +39,12 @@ namespace Samples
             btnSetBadge = new Button
             {
                 Text = "Set Badge",
-                Command = new Command(() => CrossNotifications.Current.SetBadge(new Random().Next(100)))
+                Command = new Command(SetBadge)
             };
             btnClearBadge = new Button
             {
                 Text = "Clear Badge",
-                Command = new Command(() => CrossNotifications.Current.SetBadge(0))
+                Command = new Command(ClearBadge)
             };
             lblTestNotif = new Label
             {
@@ -57,27 +54,17 @@ namespace Samples
             btnTestNotifDefIcon = new Button
             {
                 Text = "Notification w/ default icon",
-                Command = new Command(() =>
-                    CrossNotifications.Current.Send(new Notification
-                    {
-                        Title = "HELLO!",
-                        Message = "Hello from the ACR Sample Notification App, you should see the App's icon displayed",
-                        Vibrate = true,
-                        When = TimeSpan.FromSeconds(10),
-                    }))
+                Command = new Command(TestNotifDefIcon)
             };
             btnTestNotifCustomIcon = new Button
             {
                 Text = "Notification w/ custom icon",
-                Command = new Command(() =>
-                    CrossNotifications.Current.Send(new Notification
-                    {
-                        Title = "HELLO!",
-                        Message = "Hello from the ACR Sample Notification App, you should see a custom icon displayed",
-                        Vibrate = true,
-                        When = TimeSpan.FromSeconds(10),
-                        IconName = "ic_addcard"
-                    }))
+                Command = new Command(TestNotifCustomIcon)
+            };
+            btnTestNotifMetadata = new Button
+            {
+                Text = "Notification w/ metadata",
+                Command = new Command(TestNotifMetadata)
             };
             lblOthers = new Label
             {
@@ -87,34 +74,17 @@ namespace Samples
             btnMultipleMsgs = new Button
             {
                 Text = "Multiple Timed Messages (10 messages x 5 seconds apart)",
-                Command = new Command(() =>
-                {
-                    CrossNotifications.Current.Send(new Notification
-                    {
-                        Title = "Samples",
-                        Message = "Starting Sample Schedule Notifications"
-                    });
-                    for (var i = 1; i < 11; i++)
-                    {
-                        var seconds = i * 5;
-                        var id = CrossNotifications.Current.Send(new Notification
-                        {
-                            Message = $"Message {i}",
-                            When = TimeSpan.FromSeconds(seconds)
-                        });
-                        Debug.WriteLine($"Notification ID: {id}");
-                    }
-                })
+                Command = new Command(TestMultipleMsgs)
             };
             btnCancelAll = new Button
             {
                 Text = "Cancel All Notifications",
-                Command = new Command(() => CrossNotifications.Current.CancelAll())
+                Command = new Command(CancelAll)
             };
             btnVibrate = new Button
             {
                 Text = "Vibrate",
-                Command = new Command(() => CrossNotifications.Current.Vibrate())
+                Command = new Command(Vibrate)
             };
 
             // set layout
@@ -131,6 +101,7 @@ namespace Samples
                     lblTestNotif,
                     btnTestNotifDefIcon,
                     btnTestNotifCustomIcon,
+                    btnTestNotifMetadata,
                     lblOthers,
                     btnMultipleMsgs,
                     btnCancelAll,
@@ -141,7 +112,7 @@ namespace Samples
 
             // set content to root
             this.Content = root;
-        } 
+        }
 
 
         public MainPage()
@@ -151,5 +122,95 @@ namespace Samples
             Notification.DefaultTitle = "Test Title";
         }
 
+
+        async void RequestPermission()
+        {
+            var result = await CrossNotifications.Current.RequestPermission();
+            btnPermission.Text = result ? "Permission Granted" : "Permission Denied";
+        }
+
+        void SetBadge()
+        {
+            CrossNotifications.Current.SetBadge(new Random().Next(100));
+        }
+
+        void ClearBadge()
+        {
+            CrossNotifications.Current.SetBadge(0);
+        }
+
+        void TestNotifDefIcon()
+        {
+            CrossNotifications.Current.Send(new Notification
+            {
+                Title = "HELLO!",
+                Message = "Hello from the ACR Sample Notification App, you should see the App's icon displayed",
+                Vibrate = true,
+                When = TimeSpan.FromSeconds(10),
+            });
+        }
+
+        void TestNotifCustomIcon()
+        {
+            CrossNotifications.Current.Send(new Notification
+            {
+                Title = "HELLO!",
+                Message = "Hello from the ACR Sample Notification App, you should see a custom icon displayed",
+                Vibrate = true,
+                When = TimeSpan.FromSeconds(10),
+                IconName = "ic_addcard"
+            });
+        }
+
+        private void TestNotifMetadata()
+        {
+            var notif = new Notification
+            {
+                Title = "METADATA!",
+                When = TimeSpan.FromSeconds(12),
+                Vibrate = true,
+                IconName = "ic_addcard"
+            };
+
+            notif.SetMetadata("Val_PI", Math.PI.ToString());
+            notif.Metadata.Add("SomeKey", "Anything you want!");
+
+            //notif.Message = $"Every notification can have some metadata attatched, like the value of PI: {notif.Metadata["Val_PI"]}";
+            notif.Message = $"The value of PI: {notif.Metadata["Val_PI"]}";
+
+            CrossNotifications.Current.Send(notif);
+        }
+
+        void TestMultipleMsgs()
+        {
+            CrossNotifications.Current.Send(new Notification
+            {
+                Title = "Samples",
+                Message = "Starting Sample Schedule Notifications",
+                IconName = "ic_addcard"
+            });
+
+            for (var i = 1; i < 11; i++)
+            {
+                var seconds = i * 5;
+                var id = CrossNotifications.Current.Send(new Notification
+                {
+                    Message = $"Message {i}",
+                    When = TimeSpan.FromSeconds(seconds)
+                });
+
+                //Debug.WriteLine($"Notification ID: {id}");
+            }
+        }
+
+        void CancelAll()
+        {
+            CrossNotifications.Current.CancelAll();
+        }
+
+        void Vibrate()
+        {
+            CrossNotifications.Current.Vibrate();
+        }
     }
 }

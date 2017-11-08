@@ -1,13 +1,12 @@
 ﻿using System;
-using SQLite;
+using LiteDB;
 
 
 namespace Plugin.Notifications.Infrastructure
 {
     public class DbSettings
     {
-        [PrimaryKey]
-        [AutoIncrement]
+        [BsonId(true)]
         public int Id { get; set; }
 
         public int CurrentBadge { get; set; }

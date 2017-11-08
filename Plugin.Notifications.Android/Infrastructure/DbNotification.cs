@@ -1,12 +1,11 @@
 ﻿using System;
-using SQLite;
-
+using LiteDB;
 
 namespace Plugin.Notifications.Infrastructure
 {
     public class DbNotification
     {
-        [PrimaryKey]
+        [BsonId(true)]
         public int Id { get; set; }
 
         public string Title { get; set; }
