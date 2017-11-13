@@ -69,7 +69,7 @@
       <Version>1.1.809</Version>
     </PackageReference>
     <PackageReference Include="Xamarin.Android.Support.Compat">
-      <Version>25.3.1</Version>
+      <Version>25.4.0.2</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
