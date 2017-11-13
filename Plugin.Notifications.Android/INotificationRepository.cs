@@ -11,6 +11,7 @@ namespace Plugin.Notifications
         void Insert(Notification notification);
         void Delete(int id);
         void DeleteAll();
+        //void CleanUpOld();
 
         int CurrentScheduleId { get; set; }
         int CurrentBadge { get; set; }

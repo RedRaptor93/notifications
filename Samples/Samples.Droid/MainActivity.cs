@@ -1,10 +1,12 @@
 ﻿using System;
 using Android.App;
+using Android.Content;
 using Android.Content.PM;
 using Android.OS;
 using Xamarin.Forms;
 using Xamarin.Forms.Platform.Android;
-
+using Plugin.Notifications;
+using System.Linq;
 
 namespace Samples.Droid
 {
@@ -24,7 +26,9 @@ namespace Samples.Droid
 
             FormsAppCompatActivity.ToolbarResource = Resource.Layout.Toolbar;
             FormsAppCompatActivity.TabLayoutResource = Resource.Layout.TabLayout;
+
         }
+
     }
 }
 

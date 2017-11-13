@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
 using Xamarin.Forms;
+using System.Linq;
 
 namespace Samples
 {
@@ -19,13 +20,21 @@ namespace Samples
             btnMultipleMsgs, btnCancelAll, btnVibrate,
             btnTestNotifMetadata;
 
-        Label lblTestNotif, lblBadges, lblOthers;
+        Label lblTestNotif, lblBadges, lblOthers,
+            lblPermission;
 
         private void InitComponents()
         {
             // init components
             root = new ScrollView();
 
+            var labelMargin = new Thickness(10, 5);
+
+            lblPermission = new Label
+            {
+                Text = "If you're on iOS, you must request permission before starting",
+                Margin = labelMargin
+            };
             btnPermission = new Button
             {
                 Text = "Request Permission",
@@ -34,7 +43,7 @@ namespace Samples
             lblBadges = new Label
             {
                 Text = "Set and clear Badge numbers",
-                Margin = new Thickness(10, 5)
+                Margin = labelMargin
             };
             btnSetBadge = new Button
             {
@@ -49,7 +58,7 @@ namespace Samples
             lblTestNotif = new Label
             {
                 Text = "Send notifications, Press the buttons below and exit App withing 10 seconds:",
-                Margin = new Thickness(10, 5)
+                Margin = labelMargin
             };
             btnTestNotifDefIcon = new Button
             {
@@ -94,6 +103,7 @@ namespace Samples
 
                 Children =
                 {
+                    lblPermission,
                     btnPermission,
                     lblBadges,
                     btnSetBadge,
@@ -120,8 +130,26 @@ namespace Samples
             InitComponents();
             Title = "Notifications";
             Notification.DefaultTitle = "Test Title";
+            CrossNotifications.Current.Activated += Notification_Activated;
         }
 
+        private void Notification_Activated(object sender, Notification e)
+        {
+            Debug.WriteLine("Notification receved! Id: {0}, SendTime: {1}, Metadata count: {2}", e.Id, e.SendTime, e.Metadata.Count);
+
+            //if (App.IsInBackgrounded)
+            //{
+            //    Navigation.PushAsync(this).Wait();
+            //}
+
+            if (e.Metadata.Count > 0)
+            {
+                var metaContent = e.Metadata.Select(p => $"[{p.Key}] = {p.Value}");
+                var msg = string.Join("\n", metaContent);
+
+                DisplayAlert("Notif. Metadata", msg, "ok");
+            }
+        }
 
         async void RequestPermission()
         {
@@ -167,7 +195,7 @@ namespace Samples
             var notif = new Notification
             {
                 Title = "METADATA!",
-                When = TimeSpan.FromSeconds(12),
+                When = TimeSpan.FromSeconds(10),
                 Vibrate = true,
                 IconName = "ic_addcard"
             };

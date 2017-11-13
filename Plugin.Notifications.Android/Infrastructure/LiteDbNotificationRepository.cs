@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using LiteDB;
+using System;
+using System.Collections.Generic;
 using System.Linq;
-using LiteDB;
+using Android.Util;
 
 
 namespace Plugin.Notifications.Infrastructure
@@ -9,7 +11,6 @@ namespace Plugin.Notifications.Infrastructure
     {
         readonly AcrLiteDbConnection conn;
         readonly DbSettings settings;
-
 
         public LiteDbNotificationRepository()
         {
@@ -20,6 +21,8 @@ namespace Plugin.Notifications.Infrastructure
                 settings = new DbSettings();
                 conn.Settings.Insert(settings);
             }
+
+            CleanUpOld();
         }
 
 
@@ -48,6 +51,33 @@ namespace Plugin.Notifications.Infrastructure
             }
         }
 
+        // find old notifs. w/ and remove them
+        private void CleanUpOld()
+        {
+            var notCount = conn.Notifications.Count();
+            Log.Debug(nameof(LiteDbNotificationRepository), "{0} notifications in repo.", notCount);
+
+            if (notCount > 0)
+            {
+                var oldDate = DateTime.Today.AddDays(-3);
+                var query = Query.LT("DateScheduled", oldDate);
+
+                var oldNots = conn.Notifications.Find(query).ToList();
+                var nToDel = oldNots.Count;
+
+                int nDeleted = conn.Notifications.Delete(query);
+                Log.Debug(nameof(LiteDbNotificationRepository), "{0} old notifications removed", nDeleted);
+
+                // remove metadata
+                if (nDeleted > 0)
+                {
+                    var mQuery = Query.In("NotificationId", oldNots.Select(on => new BsonValue(on.Id)));
+                    int nmDeleted = conn.NotificationMetadata.Delete(mQuery);
+                    Log.Debug(nameof(LiteDbNotificationRepository), "{0} old notif. metadata removed", nmDeleted);
+                }
+            }
+        }
+
         public void Delete(int id)
         {
             var bsonId = new BsonValue(id);
@@ -64,12 +94,11 @@ namespace Plugin.Notifications.Infrastructure
 
         public Notification GetById(int id)
         {
-            var bsonId = new BsonValue(id);
-            var dbNot = conn.Notifications.FindById(bsonId);
+            var dbNot = conn.Notifications.FindById(id);
             if (dbNot == null) return null;
 
             var dbMeta = conn.NotificationMetadata
-                             .Find(Query.EQ("NotificationId", bsonId))
+                             .Find(Query.EQ("NotificationId", id))
                              .ToList();
 
             var notif = new Notification
@@ -135,17 +164,27 @@ namespace Plugin.Notifications.Infrastructure
 
                 conn.Notifications.Insert(db);
 
-                foreach (var pair in notification.Metadata)
+                var dbm = notification.Metadata
+                .Select(n => new DbNotificationMetadata
                 {
-                    var meta = new DbNotificationMetadata
-                    {
-                        NotificationId = db.Id,
-                        Key = pair.Key,
-                        Value = pair.Value
-                    };
+                    NotificationId = db.Id,
+                    Key = n.Key,
+                    Value = n.Value
+                });
 
-                    conn.NotificationMetadata.Insert(meta);
-                }
+                conn.NotificationMetadata.Insert(dbm);
+
+                //foreach (var pair in notification.Metadata)
+                //{
+                //    var meta = new DbNotificationMetadata
+                //    {
+                //        NotificationId = db.Id,
+                //        Key = pair.Key,
+                //        Value = pair.Value
+                //    };
+
+                //    conn.NotificationMetadata.Insert(meta);
+                //}
 
             }
             catch 

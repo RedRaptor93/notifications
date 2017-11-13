@@ -47,6 +47,8 @@ namespace Plugin.Notifications
         /// <returns>The messageID that you can use to cancel with</returns>
         Task Send(Notification notification);
 
+        //Task<int> Send(Notification notification);
+
 
         /// <summary>
         /// Get the current badge count

@@ -27,5 +27,6 @@ namespace Samples
             base.OnSleep();
             App.IsInBackgrounded = true;
         }
+
     }
 }

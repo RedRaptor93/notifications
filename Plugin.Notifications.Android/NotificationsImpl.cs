@@ -43,31 +43,41 @@ namespace Plugin.Notifications
             }
             else
             {
-                var iconResourceId = AndroidConfig.GetResourceIdByName(notification.IconName ?? "icon");
-                var launchIntent = new Intent(Application.Context, typeof(NotificationActionService));
-                launchIntent.PutExtra(Constants.ACTION_KEY, "0");
-                //var launchIntent = Application
-                //    .Context
-                //    .PackageManager
-                //    .GetLaunchIntentForPackage(Application.Context.PackageName);
-                //launchIntent.SetFlags(ActivityFlags.NewTask | ActivityFlags.ClearTask);
+                int iconResourceId = notification.IconName != null ? AndroidConfig.GetResourceIdByName(notification.IconName) 
+                                                                   : AndroidConfig.AppIconResourceId;
+
+                var launchIntent = Application
+                    .Context
+                    .PackageManager
+                    .GetLaunchIntentForPackage(Application.Context.PackageName);
+
+                var notifClickIntent = new Intent(Application.Context, typeof(NotificationActionService));
+                notifClickIntent.PutExtra(Constants.ACTION_KEY, 0);
+                notifClickIntent.PutExtra(Constants.NOTIFICATION_ID, notification.Id.Value);
 
                 foreach (var pair in notification.Metadata)
                 {
-                    launchIntent.PutExtra(pair.Key, pair.Value);
+                    notifClickIntent.PutExtra(pair.Key, pair.Value);
                 }
 
+                // WORKS
+                var pif = PendingIntentFlags.UpdateCurrent | PendingIntentFlags.OneShot;
+                PendingIntent pendingIntent = PendingIntent.GetService(Application.Context, notification.Id.Value, notifClickIntent, pif);
+
+                //var tsbpi = TaskStackBuilder.Create(Application.Context)
+                //            .AddNextIntent(launchIntent)
+                //            .AddNextIntent(notifClickIntent)
+                //            .GetPendingIntent(notification.Id.Value, PendingIntentFlags.OneShot)    
+                //            ;
 
                 var builder = new NotificationCompat.Builder(Application.Context)
                     .SetAutoCancel(true)
                     .SetContentTitle(notification.Title)
                     .SetContentText(notification.Message)
                     .SetSmallIcon(iconResourceId)
-                    .SetContentIntent(TaskStackBuilder
-                        .Create(Application.Context)
-                        .AddNextIntent(launchIntent)
-                        .GetPendingIntent(notification.Id.Value, PendingIntentFlags.OneShot)
-                    );
+                    //.SetContentIntent(tsbpi)
+                    .SetContentIntent(pendingIntent)
+                    ;
 
                 if (notification.Vibrate)
                 {
@@ -98,9 +108,9 @@ namespace Plugin.Notifications
                 }
 
                 var not = builder.Build();
-                NotificationManagerCompat
-                    .From(Application.Context)
-                    .Notify(notification.Id.Value, not);
+                NotificationManagerCompat.From(Application.Context)
+                                         .Notify(notification.Id.Value, not);
+
             }
             return Task.CompletedTask;
         }
@@ -173,7 +183,19 @@ namespace Plugin.Notifications
         {
             var notification = AndroidConfig.Repository.GetById(id);
             if (notification != null)
+            {
+                // WORKS OK-ISH
+                var launchIntent = Application
+                                       .Context
+                                       .PackageManager
+                                       .GetLaunchIntentForPackage(Application.Context.PackageName);
+
+
+                //var pif = PendingIntentFlags.UpdateCurrent | PendingIntentFlags.OneShot;
+                //PendingIntent.GetActivity(Application.Context, id, launchIntent, pif).Send();
+
                 this.OnActivated(notification);
+            }
         }
 
 
@@ -183,7 +205,7 @@ namespace Plugin.Notifications
             if (notification == null)
                 return;
 
-            AndroidConfig.Repository.Delete(notificationId);
+            //AndroidConfig.Repository.Delete(notificationId);
 
             // resend without schedule so it goes through normal mechanism
             notification.When = null;

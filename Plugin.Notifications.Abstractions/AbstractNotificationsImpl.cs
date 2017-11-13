@@ -32,8 +32,9 @@ namespace Plugin.Notifications
 
 
         protected virtual void OnActivated(Notification notification)
-            => this.Activated?.Invoke(this, notification);
-
+        {
+            this.Activated?.Invoke(this, notification);
+        }
 
         public void Dispose() => this.Dispose(true);
         protected virtual void Dispose(bool disposing)

@@ -12,5 +12,6 @@ namespace Plugin.Notifications
             var notificationId = intent.NotificationId();
             (CrossNotifications.Current as IAndroidNotificationReceiver)?.TriggerScheduledNotification(notificationId);
         }
+
     }
 }
