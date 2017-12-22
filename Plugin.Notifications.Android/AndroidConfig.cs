@@ -8,8 +8,8 @@ namespace Plugin.Notifications
     public static class AndroidConfig
     {
         public static int AppIconResourceId { get; set; } = GetResourceIdByName("icon");
-        //public static INotificationRepository Repository { get; set; } = new SqliteNotificationRepository();
-        public static INotificationRepository Repository { get; } = new LiteDbNotificationRepository();
+        internal static INotificationRepository Repository { get; } = new LiteDbNotificationRepository();
+        public static NotificationTapAction TapAction { get; set; } = NotificationTapAction.OpenApp;
 
 
         public static int GetResourceIdByName(string iconName) => Application
@@ -20,5 +20,11 @@ namespace Plugin.Notifications
                 "drawable",
                 Application.Context.PackageName
             );
+    }
+
+    public enum NotificationTapAction
+    {
+        OpenApp,
+        RaiseEvent
     }
 }

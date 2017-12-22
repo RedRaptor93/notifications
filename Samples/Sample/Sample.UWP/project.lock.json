@@ -26442,22 +26442,22 @@
       "frameworks": {
         "uap10.0.10586": {
           "projectReferences": {
-            "C:\\Users\\Pedro\\Source\\Repos\\acr_notifications\\Samples\\Sample\\Sample\\Sample.csproj": {
-              "projectPath": "C:\\Users\\Pedro\\Source\\Repos\\acr_notifications\\Samples\\Sample\\Sample\\Sample.csproj"
-            },
             "C:\\Users\\Pedro\\Source\\Repos\\acr_notifications\\Plugin.Notifications.Abstractions\\Plugin.Notifications.Abstractions.csproj": {
               "projectPath": "C:\\Users\\Pedro\\Source\\Repos\\acr_notifications\\Plugin.Notifications.Abstractions\\Plugin.Notifications.Abstractions.csproj"
             },
             "C:\\Users\\Pedro\\Source\\Repos\\acr_notifications\\Plugin.Notifications.Uwp\\Plugin.Notifications.Uwp.csproj": {
               "projectPath": "C:\\Users\\Pedro\\Source\\Repos\\acr_notifications\\Plugin.Notifications.Uwp\\Plugin.Notifications.Uwp.csproj"
+            },
+            "C:\\Users\\Pedro\\Source\\Repos\\acr_notifications\\Samples\\Sample\\Sample\\Sample.csproj": {
+              "projectPath": "C:\\Users\\Pedro\\Source\\Repos\\acr_notifications\\Samples\\Sample\\Sample\\Sample.csproj"
             }
           }
         }
       }
     },
     "dependencies": {
-      "Microsoft.NETCore.UniversalWindowsPlatform": "5.3.3",
-      "Xamarin.Forms": "2.4.0.280"
+      "Microsoft.NETCore.UniversalWindowsPlatform": "[5.3.3, )",
+      "Xamarin.Forms": "[2.4.0.280, )"
     },
     "frameworks": {
       "uap10.0.10586": {}

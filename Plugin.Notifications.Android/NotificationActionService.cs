@@ -2,6 +2,8 @@
 using Android.App;
 using Android.Content;
 using Android.OS;
+using Android.Runtime;
+using Java.IO;
 using Debug = System.Diagnostics.Debug;
 
 namespace Plugin.Notifications
@@ -31,14 +33,7 @@ namespace Plugin.Notifications
                 (CrossNotifications.Current as IAndroidNotificationReceiver)?.TriggerNotification(notificationId);
             }
         }
+
     }
 
-    //[BroadcastReceiver(Enabled = true, Label = "Notifications Action Receiver")]
-    //public class NotificationActionReceiver : BroadcastReceiver
-    //{
-    //    public override void OnReceive(Context context, Intent intent)
-    //    {
-    //        throw new NotImplementedException();
-    //    }
-    //}
 }

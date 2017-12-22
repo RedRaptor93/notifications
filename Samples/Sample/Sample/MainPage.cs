@@ -27,6 +27,18 @@ namespace Sample
         {
             // init components
             root = new ScrollView();
+            Thickness pagePadding;
+            switch (Device.RuntimePlatform)
+            {
+                case Device.iOS:
+                    pagePadding = new Thickness(0,20,0,0);
+                    break;
+                default:
+                    pagePadding = new Thickness();
+                    break;
+            }
+            this.Padding = pagePadding;
+
 
             var labelMargin = new Thickness(10, 5);
 
@@ -130,17 +142,12 @@ namespace Sample
             InitComponents();
             Title = "Notifications";
             Notification.DefaultTitle = "Test Title";
-            CrossNotifications.Current.Activated += Notification_Activated;
+            //CrossNotifications.Current.Activated += Notification_Activated;
         }
 
         private void Notification_Activated(object sender, Notification e)
         {
             Debug.WriteLine("Notification receved! Id: {0}, SendTime: {1}, Metadata count: {2}", e.Id, e.SendTime, e.Metadata.Count);
-
-            //if (App.IsInBackgrounded)
-            //{
-            //    Navigation.PushAsync(this).Wait();
-            //}
 
             if (e.Metadata.Count > 0)
             {
@@ -150,6 +157,7 @@ namespace Sample
                 DisplayAlert("Notif. Metadata", msg, "ok");
             }
         }
+
 
         async void RequestPermission()
         {

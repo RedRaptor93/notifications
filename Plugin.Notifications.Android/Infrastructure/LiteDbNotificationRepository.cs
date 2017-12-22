@@ -51,7 +51,7 @@ namespace Plugin.Notifications.Infrastructure
             }
         }
 
-        // find old notifs. w/ and remove them
+        // find old notifs. (Scheduled 7+ days ago) and remove them
         private void CleanUpOld()
         {
             var notCount = conn.Notifications.Count();
@@ -59,11 +59,10 @@ namespace Plugin.Notifications.Infrastructure
 
             if (notCount > 0)
             {
-                var oldDate = DateTime.Today.AddDays(-3);
+                var oldDate = DateTime.Today.AddDays(-7);
                 var query = Query.LT("DateScheduled", oldDate);
 
-                var oldNots = conn.Notifications.Find(query).ToList();
-                var nToDel = oldNots.Count;
+                var oldNots = conn.Notifications.Find(query);
 
                 int nDeleted = conn.Notifications.Delete(query);
                 Log.Debug(nameof(LiteDbNotificationRepository), "{0} old notifications removed", nDeleted);
@@ -80,10 +79,8 @@ namespace Plugin.Notifications.Infrastructure
 
         public void Delete(int id)
         {
-            var bsonId = new BsonValue(id);
-
-            conn.Notifications.Delete(bsonId);
-            conn.NotificationMetadata.Delete(bsonId);
+            conn.Notifications.Delete(id);
+            conn.NotificationMetadata.Delete(id);
         }
 
         public void DeleteAll()
@@ -173,18 +170,6 @@ namespace Plugin.Notifications.Infrastructure
                 });
 
                 conn.NotificationMetadata.Insert(dbm);
-
-                //foreach (var pair in notification.Metadata)
-                //{
-                //    var meta = new DbNotificationMetadata
-                //    {
-                //        NotificationId = db.Id,
-                //        Key = pair.Key,
-                //        Value = pair.Value
-                //    };
-
-                //    conn.NotificationMetadata.Insert(meta);
-                //}
 
             }
             catch 

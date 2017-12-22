@@ -43,45 +43,51 @@ namespace Plugin.Notifications
             }
             else
             {
-                int iconResourceId = notification.IconName != null ? AndroidConfig.GetResourceIdByName(notification.IconName) 
+                int iconResourceId = notification.IconName != null ? AndroidConfig.GetResourceIdByName(notification.IconName)
                                                                    : AndroidConfig.AppIconResourceId;
 
-                var launchIntent = Application
-                    .Context
-                    .PackageManager
-                    .GetLaunchIntentForPackage(Application.Context.PackageName);
-
-                var notifClickIntent = new Intent(Application.Context, typeof(NotificationActionService));
-                notifClickIntent.PutExtra(Constants.ACTION_KEY, 0);
-                notifClickIntent.PutExtra(Constants.NOTIFICATION_ID, notification.Id.Value);
-
-                foreach (var pair in notification.Metadata)
-                {
-                    notifClickIntent.PutExtra(pair.Key, pair.Value);
-                }
-
-                // WORKS
-                var pif = PendingIntentFlags.UpdateCurrent | PendingIntentFlags.OneShot;
-                PendingIntent pendingIntent = PendingIntent.GetService(Application.Context, notification.Id.Value, notifClickIntent, pif);
-
-                //var tsbpi = TaskStackBuilder.Create(Application.Context)
-                //            .AddNextIntent(launchIntent)
-                //            .AddNextIntent(notifClickIntent)
-                //            .GetPendingIntent(notification.Id.Value, PendingIntentFlags.OneShot)    
-                //            ;
 
                 var builder = new NotificationCompat.Builder(Application.Context)
                     .SetAutoCancel(true)
                     .SetContentTitle(notification.Title)
                     .SetContentText(notification.Message)
                     .SetSmallIcon(iconResourceId)
-                    //.SetContentIntent(tsbpi)
-                    .SetContentIntent(pendingIntent)
+                    //.SetContentIntent(pendingIntent)
+                    //.SetContentIntent(TaskStackBuilder
+                    //    .Create(Application.Context)
+                    //    .AddNextIntent(launchIntent)
+                    //    .GetPendingIntent(notification.Id.Value, PendingIntentFlags.OneShot))
                     ;
+
+                switch (AndroidConfig.TapAction)
+                {
+                    case NotificationTapAction.OpenApp:
+
+                        Intent launchIntent = GetLaunchIntent(notification);
+                        launchIntent.SetFlags(ActivityFlags.NewTask | ActivityFlags.ClearTask);
+                        var launchPI = TaskStackBuilder.Create(Application.Context)
+                                                  .AddNextIntent(launchIntent)
+                                                  .GetPendingIntent(notification.Id.Value, PendingIntentFlags.OneShot);
+
+                        builder.SetContentIntent(launchPI);
+                        break;
+
+                    case NotificationTapAction.RaiseEvent:
+
+                        Intent notifClickIntent = GetServiceIntent(notification);
+                        var pif = PendingIntentFlags.UpdateCurrent | PendingIntentFlags.OneShot;
+                        var notifPI = PendingIntent.GetService(Application.Context, notification.Id.Value, notifClickIntent, pif);
+
+                        builder.SetContentIntent(notifPI);
+                        break;
+
+                    default:
+                        throw new Exception("Unexpected action");
+                }
 
                 if (notification.Vibrate)
                 {
-                    builder.SetVibrate(new long[] {500, 500});
+                    builder.SetVibrate(new long[] { 500, 500 });
                 }
 
                 // Sound
@@ -115,6 +121,33 @@ namespace Plugin.Notifications
             return Task.CompletedTask;
         }
 
+        private static Intent GetServiceIntent(Notification notification)
+        {
+            var notifClickIntent = new Intent(Application.Context, typeof(NotificationActionService));
+            notifClickIntent.PutExtra(Constants.ACTION_KEY, 0);
+            notifClickIntent.PutExtra(Constants.NOTIFICATION_ID, notification.Id.Value);
+
+            foreach (var pair in notification.Metadata)
+            {
+                notifClickIntent.PutExtra(pair.Key, pair.Value);
+            }
+
+
+            return notifClickIntent;
+        }
+        private static Intent GetLaunchIntent(Notification notification)
+        {
+            var launchIntent = Application.Context.PackageManager.GetLaunchIntentForPackage(Application.Context.PackageName);
+            launchIntent.PutExtra(Constants.ACTION_KEY, 0);
+            launchIntent.PutExtra(Constants.NOTIFICATION_ID, notification.Id.Value);
+
+            foreach (var pair in notification.Metadata)
+            {
+                launchIntent.PutExtra(pair.Key, pair.Value);
+            }
+
+            return launchIntent;
+        }
 
         public override Task CancelAll()
         {
@@ -185,19 +218,16 @@ namespace Plugin.Notifications
             if (notification != null)
             {
                 // WORKS OK-ISH
-                var launchIntent = Application
-                                       .Context
-                                       .PackageManager
-                                       .GetLaunchIntentForPackage(Application.Context.PackageName);
 
+                //var launchIntent = Application.Context.PackageManager.GetLaunchIntentForPackage(Application.Context.PackageName);
+                //launchIntent.SetFlags(ActivityFlags.ReorderToFront);
 
-                //var pif = PendingIntentFlags.UpdateCurrent | PendingIntentFlags.OneShot;
-                //PendingIntent.GetActivity(Application.Context, id, launchIntent, pif).Send();
+                //var pif = PendingIntentFlags.UpdateCurrent;
+                //PendingIntent.GetActivity(Application.Context, 0, launchIntent, pif).Send();
 
                 this.OnActivated(notification);
             }
         }
-
 
         public void TriggerScheduledNotification(int notificationId)
         {
@@ -213,6 +243,7 @@ namespace Plugin.Notifications
             this.Send(notification);
         }
 
+
         protected virtual long GetEpochMills(DateTime sendTime)
         {
             var utc = sendTime.ToUniversalTime();
@@ -220,7 +251,6 @@ namespace Plugin.Notifications
             var utcAlarmTimeInMillis = utc.AddSeconds(-epochDiff).Ticks / 10000;
             return utcAlarmTimeInMillis;
         }
-
 
         protected virtual void CancelInternal(int notificationId)
         {

@@ -10,7 +10,6 @@ namespace Plugin.Notifications
         public static bool SystemSoundFallback { get; set; } = true;
         public static string DefaultTitle { get; set; }
         public static string DefaultSound { get; set; }
-        //public static string DefaultIcon { get; set; } = "icon";
 
 
         public int? Id { get; set; }
@@ -62,4 +61,5 @@ if (notification.Interval != NotificationInterval.None) {
 			}
          */
     }
+
 }
