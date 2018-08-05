@@ -58,13 +58,18 @@ namespace Plugin.Notifications
             if (notification.Id == null)
                 notification.GeneratedNotificationId();
 
+            if (notification.Sound == Notification.PlatformDefault)
+                notification.Sound = UILocalNotification.DefaultSoundName;
+
             var not = new UILocalNotification
             {
                 AlertTitle = notification.Title,
                 AlertBody = notification.Message,
-                SoundName = notification.Sound,
-                UserInfo = notification.MetadataToNsDictionary()
+                AlertLaunchImage = notification.Icon,
+                UserInfo = notification.MetadataToNsDictionary(),
+                SoundName = notification.Sound
             };
+
             if (notification.ScheduledDate != null)
                 not.FireDate = notification.ScheduledDate.Value.ToNSDate();
 

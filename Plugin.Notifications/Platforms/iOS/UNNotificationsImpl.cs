@@ -48,10 +48,18 @@ namespace Plugin.Notifications
             {
                 Title = notification.Title,
                 Body = notification.Message,
-                UserInfo = notification.MetadataToNsDictionary()
+                UserInfo = notification.MetadataToNsDictionary(),
+                LaunchImageName = notification.Icon
             };
-            if (!String.IsNullOrWhiteSpace(notification.Sound))
+
+            if (notification.Sound == Notification.PlatformDefault)
+            {
+                content.Sound = UNNotificationSound.Default;
+            }
+            else if (!String.IsNullOrWhiteSpace(notification.Sound))
+            {
                 content.Sound = UNNotificationSound.GetSound(notification.Sound);
+            }
 
             var dt = notification.ScheduledDate ?? DateTime.Now;
             var request = UNNotificationRequest.FromIdentifier(

@@ -75,11 +75,14 @@ namespace Plugin.Notifications
                     .AddNextIntent(launchIntent)
                     .GetPendingIntent(notification.Id.Value, (int)(PendingIntentFlags.OneShot | PendingIntentFlags.CancelCurrent));
 
+                int iconResId = notification.Icon != null ? AndroidConfig.GetResourceIdByName(notification.Icon)
+                                                          : AndroidConfig.AppIconResourceId;
+
                 var builder = new NotificationCompat.Builder(Application.Context)
                     .SetAutoCancel(true)
                     .SetContentTitle(notification.Title)
                     .SetContentText(notification.Message)
-                    .SetSmallIcon(AndroidConfig.AppIconResourceId)
+                    .SetSmallIcon(iconResId)
                     .SetContentIntent(pendingIntent);
 
                 if (notification.Vibrate)
@@ -87,10 +90,23 @@ namespace Plugin.Notifications
 
                 if (notification.Sound != null)
                 {
-                    if (!notification.Sound.Contains("://"))
-                        notification.Sound = $"{ContentResolver.SchemeAndroidResource}://{Application.Context.PackageName}/raw/{notification.Sound}";
+                    Android.Net.Uri uri;
 
-                    var uri = Android.Net.Uri.Parse(notification.Sound);
+                    if (notification.Sound == Notification.PlatformDefault)
+                    {
+                        // Fallback to the system default notification sound
+                        uri = Android.Media.RingtoneManager.GetDefaultUri(Android.Media.RingtoneType.Notification);
+                    }
+                    else if (!notification.Sound.Contains("://"))
+                    {
+                        notification.Sound = $"{ContentResolver.SchemeAndroidResource}://{Application.Context.PackageName}/raw/{notification.Sound}";
+                        uri = Android.Net.Uri.Parse(notification.Sound);
+                    }
+                    else
+                    {
+                        uri = Android.Net.Uri.Parse(notification.Sound);
+                    }
+
                     builder.SetSound(uri);
                 }
                 var not = builder.Build();

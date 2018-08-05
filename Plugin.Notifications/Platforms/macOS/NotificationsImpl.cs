@@ -43,6 +43,11 @@ namespace Plugin.Notifications
             if (notification.Id == null)
                 notification.GeneratedNotificationId();
 
+            if (notification.Sound == Notification.PlatformDefault)
+            {
+                notification.Sound = NSUserNotification.NSUserNotificationDefaultSoundName;
+            }
+
             var native = new NSUserNotification
             {
                 Identifier = notification.Id.Value.ToString(),

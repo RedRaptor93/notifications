@@ -81,17 +81,27 @@ namespace Plugin.Notifications
                     }
                 }
             };
-            if (!String.IsNullOrWhiteSpace(notification.Sound) && this.IsAudioSupported)
+
+            if (IsAudioSupported)
             {
-                if (!notification.Sound.StartsWith("ms-appx:"))
-                    notification.Sound = $"ms-appx:///Assets/Audio/{notification.Sound}.m4a";
-
-                toastContent.Audio = new ToastAudio
+                if (notification.Sound == Notification.PlatformDefault)
                 {
-                    Src = new Uri(notification.Sound)
-                };
-            }
+                    toastContent.Audio = new ToastAudio
+                    {
+                        Src = new Uri("ms-winsoundevent:Notification.Looping.Alarm")
+                    };
+                }
+                else if (!String.IsNullOrWhiteSpace(notification.Sound))
+                {
+                    if (!notification.Sound.StartsWith("ms-appx:"))
+                        notification.Sound = $"ms-appx:///Assets/Audio/{notification.Sound}.m4a";
 
+                    toastContent.Audio = new ToastAudio
+                    {
+                        Src = new Uri(notification.Sound)
+                    };
+                }
+            }
 
             if (notification.ScheduledDate == null)
             {
