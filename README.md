@@ -1,9 +1,9 @@
-# ACR Notifications Plugin for Xamarin and Windows
+# <img src="icon.png" width="71" height="71"/> ACR Notifications Plugin for Xamarin and Windows
 
 Plugin for Easy Cross Platform notifications
 
 [![NuGet](https://img.shields.io/nuget/v/Acr.Notifications.svg?maxAge=2592000)](https://www.nuget.org/packages/Acr.Notifications/)
-[Change Log - July 28, 2017](changelog.md)
+[Change Log - January 4, 2018](changelog.md)
 
 
 ## Features
@@ -22,7 +22,7 @@ Plugin for Easy Cross Platform notifications
 * macOS
 * Android 4+
 * Universal Windows Platform (Win10/UWP)
-* NET Standard 1.0
+* NET Standard 2.0
 
 ### Installation
 
@@ -71,16 +71,28 @@ await CrossNotifications.Current.GetBadge();
 
 ### Listen for Event Activations
 
-TODO
+You can have your app listen for taps on notifications.  You should install this hook in the startup of your application.
+Such as App.cs in Xamarin.Forms, AppDelegate on iOS or your launch activity/application in Android
+
+PLEASE NOTE: Activated does not work on scheduled notifications on UWP
+
+```csharp
+CrossNotifications.Current.Activated += (sender, notification) => {
+    // work with notification
+};
+```
+
 
 ### Sounds
 
 _In the notification.Sound property - set only the filename without the extension_
+You can also set Notification.DefaultSound (static) to a default config value
 
 #### Android
 * Put the sound in your /Resources/raw/ folder - make sure the file properties is set to _AndroidResource_
 * You can pass the actual full sound path OR just the name... the plugin will figure it out!
-
+* You can set your launch activity flags using AndroidConfig.LaunchActivityFlags = ActivityFlags.NewTask | ActivityFlags.ClearTask (or whatever you want)
+* 
 #### iOS
 * Put the file in your iOS app bundle
 * The file format must be a .caf file (google this to see how to make one) - ie. afconvert -f caff -d aacl@22050 -c 1 sound.aiff soundFileName.caf 
@@ -97,3 +109,7 @@ _In the notification.Sound property - set only the filename without the extensio
 
 * Why can't I set a string as an identifier
 * _Android needs an integer for how it sets identifiers_
+
+## Contributors
+
+* **[Jelle Damen](https://twitter.com/JelleDamen)** for the wonderful icons

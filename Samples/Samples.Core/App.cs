@@ -50,7 +50,7 @@ namespace Samples
                                     Title = "HELLO!",
                                     Message = "Hello from the ACR Sample Notification App",
                                     Vibrate = true,
-                                    When = TimeSpan.FromSeconds(10)
+                                    ScheduledDate = DateTime.Now.AddSeconds(10)
                                 })
                             )
                         },
@@ -70,7 +70,29 @@ namespace Samples
                                     var id = CrossNotifications.Current.Send(new Notification
                                     {
                                         Message = $"Message {i}",
-                                        When = TimeSpan.FromSeconds(seconds)
+                                        ScheduledDate = DateTime.Now.AddSeconds(seconds)
+                                    });
+                                    Debug.WriteLine($"Notification ID: {id}");
+                                }
+                            })
+                        },
+                        new Button
+                        {
+                            Text = "(Date) Send 10 messages x 5 seconds",
+                            Command = new Command(() =>
+                            {
+                                CrossNotifications.Current.Send(new Notification
+                                {
+                                    Title = "Samples",
+                                    Message = "Starting Sample Schedule Notifications"
+                                });
+                                for (var i = 1; i < 11; i++)
+                                {
+                                    var seconds = i * 5;
+                                    var id = CrossNotifications.Current.Send(new Notification
+                                    {
+                                        Message = $"Message {i}",
+                                        ScheduledDate = DateTime.Now.AddSeconds(seconds)
                                     });
                                     Debug.WriteLine($"Notification ID: {id}");
                                 }
@@ -95,9 +117,10 @@ namespace Samples
         protected override void OnStart()
         {
             base.OnStart();
-            CrossNotifications.Current.Activated += (sender, notification) =>
+            CrossNotifications.Current.Activated += async (sender, notification) =>
             {
                 Debug.WriteLine($"Notification Activated - {notification.Id} - {notification.Title}");
+                await this.MainPage.DisplayAlert("Received Notification", notification.Message, "OK");
             };
         }
 
