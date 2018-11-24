@@ -88,6 +88,7 @@ namespace Plugin.Notifications
                 {
                     toastContent.Audio = new ToastAudio
                     {
+                        // https://docs.microsoft.com/en-us/uwp/schemas/tiles/toastschema/element-audio#attributes-and-elements
                         Src = new Uri("ms-winsoundevent:Notification.Looping.Alarm")
                     };
                 }

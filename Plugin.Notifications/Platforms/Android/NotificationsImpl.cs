@@ -76,14 +76,30 @@ namespace Plugin.Notifications
                     .GetPendingIntent(notification.Id.Value, (int)(PendingIntentFlags.OneShot | PendingIntentFlags.CancelCurrent));
 
                 int iconResId = notification.Icon != null ? AndroidConfig.GetResourceIdByName(notification.Icon)
-                                                          : AndroidConfig.AppIconResourceId;
+                                                          : AndroidConfig.DefaultIcon;
 
                 var builder = new NotificationCompat.Builder(Application.Context)
                     .SetAutoCancel(true)
+                    .SetContentIntent(pendingIntent)
                     .SetContentTitle(notification.Title)
                     .SetContentText(notification.Message)
-                    .SetSmallIcon(iconResId)
-                    .SetContentIntent(pendingIntent);
+                    ;
+
+                if (notification.Icon != null)
+                {
+                    int iconId;
+
+                    if (notification.Icon == Notification.PlatformDefault)
+                    {
+                        iconId = AndroidConfig.DefaultIcon;
+                    }
+                    else
+                    {
+                        iconId = AndroidConfig.GetResourceIdByName(notification.Icon);
+                    }
+
+                    builder.SetSmallIcon(iconId);
+                }
 
                 if (notification.Vibrate)
                     builder.SetVibrate(new long[] {500, 500});
@@ -95,7 +111,7 @@ namespace Plugin.Notifications
                     if (notification.Sound == Notification.PlatformDefault)
                     {
                         // Fallback to the system default notification sound
-                        uri = Android.Media.RingtoneManager.GetDefaultUri(Android.Media.RingtoneType.Notification);
+                        uri = AndroidConfig.DefaultSound;
                     }
                     else if (!notification.Sound.Contains("://"))
                     {
