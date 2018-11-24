@@ -75,9 +75,6 @@ namespace Plugin.Notifications
                     .AddNextIntent(launchIntent)
                     .GetPendingIntent(notification.Id.Value, (int)(PendingIntentFlags.OneShot | PendingIntentFlags.CancelCurrent));
 
-                int iconResId = notification.Icon != null ? AndroidConfig.GetResourceIdByName(notification.Icon)
-                                                          : AndroidConfig.DefaultIcon;
-
                 var builder = new NotificationCompat.Builder(Application.Context)
                     .SetAutoCancel(true)
                     .SetContentIntent(pendingIntent)
@@ -85,19 +82,10 @@ namespace Plugin.Notifications
                     .SetContentText(notification.Message)
                     ;
 
-                if (notification.Icon != null)
+                // ignore PlatformDefault, there's no such thing as an out-of-the-box icon
+                if (notification.Icon != null && notification.Icon != Notification.PlatformDefault)
                 {
-                    int iconId;
-
-                    if (notification.Icon == Notification.PlatformDefault)
-                    {
-                        iconId = AndroidConfig.DefaultIcon;
-                    }
-                    else
-                    {
-                        iconId = AndroidConfig.GetResourceIdByName(notification.Icon);
-                    }
-
+                    int iconId = AndroidConfig.GetResourceIdByName(notification.Icon);
                     builder.SetSmallIcon(iconId);
                 }
 
@@ -111,7 +99,7 @@ namespace Plugin.Notifications
                     if (notification.Sound == Notification.PlatformDefault)
                     {
                         // Fallback to the system default notification sound
-                        uri = AndroidConfig.DefaultSound;
+                        uri = Android.Media.RingtoneManager.GetDefaultUri(Android.Media.RingtoneType.Notification);
                     }
                     else if (!notification.Sound.Contains("://"))
                     {
@@ -187,12 +175,12 @@ namespace Plugin.Notifications
 
         public override void Vibrate(int ms)
         {
-            using (var vibrate = (Vibrator)Application.Context.GetSystemService(Context.VibratorService))
+            using (var vib = Vibrator.FromContext(Application.Context))
             {
-                if (!vibrate.HasVibrator)
+                if (!vib.HasVibrator)
                     return;
 
-                vibrate.Vibrate(ms);
+                vib.Vibrate(VibrationEffect.CreateOneShot(ms, VibrationEffect.DefaultAmplitude));
             }
         }
 
