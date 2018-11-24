@@ -23,21 +23,14 @@ namespace Plugin.Notifications
             return pending;
         }
 
-
-        //public static Notification ToNotification(this Intent intent)
-        //{
-        //    if (!intent.HasExtra(NOTIFICATION_ID))
-        //        throw new ArgumentException("Invalid intent package");
-
-
-        //    //var notification = JsonConvert.DeserializeObject<Notification>(data);
-
-        //    // nullify date so it doesn't just reschedule
-        //    //notification.Date = null;
-        //    //notification.When = null;
-        //    //return notification;
-        //    return null;
-        //}
+        public static int GetResourceIdByName(string iconName) => Application
+            .Context
+            .Resources
+            .GetIdentifier(
+                iconName,
+                "drawable",
+                Application.Context.PackageName
+            );
 
 
         public static int NotificationId(this Intent intent) => intent.GetIntExtra(Constants.NOTIFICATION_ID, 0);

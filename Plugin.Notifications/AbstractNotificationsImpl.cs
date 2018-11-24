@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 namespace Plugin.Notifications
 {
 
-    public abstract class AbstractNotificationsImpl : INotifications, IDisposable
+    public abstract class AbstractNotificationsImpl : INotificationManager, IDisposable
     {
         ~AbstractNotificationsImpl() => this.Dispose(false);
 

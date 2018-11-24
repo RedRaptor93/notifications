@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Plugin.Notifications
 {
-    public interface INotifications
+    public interface INotificationManager
     {
         /// <summary>
         /// Fires when a notification activated
@@ -15,6 +15,10 @@ namespace Plugin.Notifications
 
         /// <summary>
         /// This is required on iOS to trigger permission request
+        /// <returns>
+        /// On iOS, returns a true if permition was granted and false otherwise.
+        /// On other platforms, always returns true
+        /// </returns>
         /// </summary>
         Task<bool> RequestPermission();
 

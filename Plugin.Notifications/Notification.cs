@@ -22,18 +22,10 @@ namespace Plugin.Notifications
         public string Icon { get; set; } = DefaultIcon;
         public IDictionary<string, string> Metadata { get; set; } = new Dictionary<string, string>();
 
-        /// <summary>
-        /// Only works with Android
-        /// </summary>
         public bool Vibrate { get; set; }
         public DateTime? ScheduledDate { get; set; }
 
         public bool IsScheduled => this.ScheduledDate != null;
-        /*
-         * TODO: Repeat Intervals
-if (notification.Interval != NotificationInterval.None) {
-				not.RepeatInterval = notification.Interval == NotificationInterval.Weekly ? NSCalendarUnit.Week : NSCalendarUnit.Day;
-			}
-         */
+
     }
 }

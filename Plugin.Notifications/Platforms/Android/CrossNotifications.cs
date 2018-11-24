@@ -1,4 +1,5 @@
 ﻿using System;
+using Plugin.Notifications.Infrastructure;
 
 
 namespace Plugin.Notifications
@@ -9,5 +10,7 @@ namespace Plugin.Notifications
         {
             Current = new NotificationsImpl();
         }
+
+        static internal INotificationRepository Repository { get; set; } = new SqliteNotificationRepository();
     }
 }

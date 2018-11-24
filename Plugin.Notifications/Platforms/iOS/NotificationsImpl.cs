@@ -9,14 +9,14 @@ namespace Plugin.Notifications
 
     public class NotificationsImpl : AbstractNotificationsImpl
     {
-        readonly INotifications impl;
+        readonly INotificationManager impl;
 
 
         public NotificationsImpl()
         {
             this.impl = UIDevice.CurrentDevice.CheckSystemVersion(10, 0)
-                ? (INotifications)new UNNotificationsImpl()
-                : (INotifications)new UILocalNotificationsImpl();
+                ? (INotificationManager)new UNNotificationsImpl()
+                : (INotificationManager)new UILocalNotificationsImpl();
 
             this.impl.Activated += (sender, notification) => this.OnActivated(notification);
         }
