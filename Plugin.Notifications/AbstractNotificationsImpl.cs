@@ -15,10 +15,12 @@ namespace Plugin.Notifications
         public abstract Task Cancel(int notificationId);
         public abstract Task Send(Notification notification);
         public abstract Task<IEnumerable<Notification>> GetScheduledNotifications();
-        public abstract Task<bool> RequestPermission();
         public abstract Task<int> GetBadge();
         public abstract Task SetBadge(int value);
-        public abstract void Vibrate(int ms);
+
+        public virtual void Vibrate(int ms) { /* noop */ }
+
+        public virtual Task<bool> RequestPermission() => Task.FromResult(true);
 
 
         public virtual async Task CancelAll()
@@ -36,8 +38,6 @@ namespace Plugin.Notifications
 
 
         public void Dispose() => this.Dispose(true);
-        protected virtual void Dispose(bool disposing)
-        {
-        }
+        protected virtual void Dispose(bool disposing) { /* noop */ }
     }
 }

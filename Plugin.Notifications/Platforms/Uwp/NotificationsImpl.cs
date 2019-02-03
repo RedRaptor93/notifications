@@ -6,7 +6,7 @@ using Windows.Foundation.Metadata;
 using Windows.Storage;
 using Windows.System.Profile;
 using Windows.UI.Notifications;
-//using Microsoft.QueryStringDotNET;
+using Windows.Data.Json;
 using Microsoft.Toolkit.Uwp.Notifications;
 
 
@@ -62,7 +62,7 @@ namespace Plugin.Notifications
 
             var toastContent = new ToastContent
             {
-                Launch = this.ToQueryString(notification.Metadata),
+                Launch = ToJsonString(notification.Metadata),
                 Visual = new ToastVisual
                 {
                     BindingGeneric = new ToastBindingGeneric
@@ -145,27 +145,33 @@ namespace Plugin.Notifications
         {
             var list = this.toastNotifier
                 .GetScheduledToastNotifications()
-                .Select(x => new Notification());
+                .Select(x => {
+                    var text_nodes = x.Content.SelectNodes("/toast/visual/binding/text");
+                    var audio_node = x.Content.SelectSingleNode("/toast/audio");
+
+                    return new Notification
+                    {
+                        Id = int.Parse(x.Id),
+                        ScheduledDate = x.DeliveryTime.LocalDateTime,
+                        Title = text_nodes[0].InnerText,
+                        Message = text_nodes[1].InnerText,
+                        Metadata = FromJsonString(x.Content.Attributes.GetNamedItem("launch").InnerText),
+                        Sound = audio_node?.Attributes.GetNamedItem("src").InnerText
+                    };
+                });
 
             return Task.FromResult(list);
         }
 
 
-        public override Task<bool> RequestPermission() => Task.FromResult(true);
-
-
         public override void Vibrate(int ms)
         {
-            //if (!ApiInformation.IsTypePresent("Windows.Phone.Devices.Notification.VibrationDevice"))
-            //    return;
-
-            //Windows
-            //    .Phone
-            //    .Devices
-            //    .Notification
-            //    .VibrationDevice
-            //    .GetDefault()?
-            //    .Vibrate(TimeSpan.FromMilliseconds(ms));
+            var device = Windows.Devices.Haptics.VibrationDevice.GetDefaultAsync().GetResults();
+            if (device.SimpleHapticsController.IsPlayDurationSupported)
+            {
+                var feedback = device.SimpleHapticsController.SupportedFeedback[0];
+                device.SimpleHapticsController.SendHapticFeedbackForDuration(feedback, 1.0, TimeSpan.FromMilliseconds(ms));
+            }
         }
 
 
@@ -200,26 +206,30 @@ namespace Plugin.Notifications
         }
 
 
-        protected virtual string ToQueryString(IDictionary<string, string> dict)
+        protected virtual string ToJsonString(IDictionary<string, string> dict)
         {
-            //var qs = new QueryString();
-            //foreach (var pair in dict)
-            //    qs.Add(pair.Key, pair.Value);
+            var json = new JsonObject();
 
-            //var r = qs.ToString();
-            //return r;
-            return String.Empty;
+            foreach (var pair in dict)
+            {
+                json[pair.Key] = JsonValue.CreateStringValue(pair.Value);
+            }
+
+            return json.Stringify();
         }
 
-
-        protected virtual IDictionary<string, string> FromQueryString(string queryString)
+        protected virtual IDictionary<string, string> FromJsonString(string jsonString)
         {
             var dict = new Dictionary<string, string>();
-            //var qs = QueryString.Parse(queryString);
-            //foreach (var pair in qs)
-            //{
-            //    dict.Add(pair.Name, pair.Value);
-            //}
+
+            if (JsonObject.TryParse(jsonString, out JsonObject json))
+            {
+                foreach (var pair in json)
+                {
+                    dict.Add(pair.Key, pair.Value.GetString());
+                }
+            }
+
             return dict;
         }
 

@@ -82,10 +82,6 @@ namespace Plugin.Notifications
         );
 
 
-        public override void Vibrate(int ms)
-        {
-        }
-
 
         public override Task<IEnumerable<Notification>> GetScheduledNotifications()
         {
@@ -101,9 +97,6 @@ namespace Plugin.Notifications
             });
             return tcs.Task;
         }
-
-
-        public override Task<bool> RequestPermission() => Task.FromResult(true);
 
 
         protected int ToNotificationId(string value)

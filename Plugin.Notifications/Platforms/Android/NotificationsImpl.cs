@@ -140,8 +140,8 @@ namespace Plugin.Notifications
             => Task.FromResult(CrossNotifications.Repository.GetScheduled());
 
 
-        public override Task<bool> RequestPermission() => Task.FromResult(true);
         public override Task<int> GetBadge() => Task.FromResult(CrossNotifications.Repository.CurrentBadge);
+
         public override Task SetBadge(int value)
         {
             try
