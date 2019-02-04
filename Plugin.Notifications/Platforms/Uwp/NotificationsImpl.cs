@@ -6,7 +6,7 @@ using Windows.Foundation.Metadata;
 using Windows.Storage;
 using Windows.System.Profile;
 using Windows.UI.Notifications;
-//using Microsoft.QueryStringDotNET;
+using System.Net;
 using Microsoft.Toolkit.Uwp.Notifications;
 
 
@@ -208,24 +208,30 @@ namespace Plugin.Notifications
 
         protected virtual string ToQueryString(IDictionary<string, string> dict)
         {
-            //var qs = new QueryString();
-            //foreach (var pair in dict)
-            //    qs.Add(pair.Key, pair.Value);
+            var qs = new System.Text.StringBuilder();
+            foreach (var pair in dict)
+            {
+                qs.AppendFormat("{0}={1}&", pair.Key, pair.Value);
+            }
+            qs.Length -= 1; // remove trailing ambersand
 
-            //var r = qs.ToString();
-            //return r;
-            return String.Empty;
+            var xmlstr = WebUtility.HtmlEncode(qs.ToString());
+            return xmlstr;
         }
 
 
         protected virtual IDictionary<string, string> FromQueryString(string queryString)
         {
             var dict = new Dictionary<string, string>();
-            //var qs = QueryString.Parse(queryString);
-            //foreach (var pair in qs)
-            //{
-            //    dict.Add(pair.Name, pair.Value);
-            //}
+
+            var qs = WebUtility.HtmlDecode(queryString);
+            var pairStrs = qs.Split('&');
+            foreach (var str in pairStrs)
+            {
+                var a = str.Split('=');
+                dict.Add(a[0], a[1]);
+            }
+
             return dict;
         }
 
