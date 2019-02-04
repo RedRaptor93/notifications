@@ -6,7 +6,7 @@ using Windows.Foundation.Metadata;
 using Windows.Storage;
 using Windows.System.Profile;
 using Windows.UI.Notifications;
-using Windows.Data.Json;
+//using Microsoft.QueryStringDotNET;
 using Microsoft.Toolkit.Uwp.Notifications;
 
 
@@ -62,7 +62,7 @@ namespace Plugin.Notifications
 
             var toastContent = new ToastContent
             {
-                Launch = ToJsonString(notification.Metadata),
+                Launch = this.ToQueryString(notification.Metadata),
                 Visual = new ToastVisual
                 {
                     BindingGeneric = new ToastBindingGeneric
@@ -155,7 +155,7 @@ namespace Plugin.Notifications
                         ScheduledDate = x.DeliveryTime.LocalDateTime,
                         Title = text_nodes[0].InnerText,
                         Message = text_nodes[1].InnerText,
-                        Metadata = FromJsonString(x.Content.Attributes.GetNamedItem("launch").InnerText),
+                        Metadata = FromQueryString(x.Content.Attributes.GetNamedItem("launch").InnerText),
                         Sound = audio_node?.Attributes.GetNamedItem("src").InnerText
                     };
                 });
@@ -206,30 +206,26 @@ namespace Plugin.Notifications
         }
 
 
-        protected virtual string ToJsonString(IDictionary<string, string> dict)
+        protected virtual string ToQueryString(IDictionary<string, string> dict)
         {
-            var json = new JsonObject();
+            //var qs = new QueryString();
+            //foreach (var pair in dict)
+            //    qs.Add(pair.Key, pair.Value);
 
-            foreach (var pair in dict)
-            {
-                json[pair.Key] = JsonValue.CreateStringValue(pair.Value);
-            }
-
-            return json.Stringify();
+            //var r = qs.ToString();
+            //return r;
+            return String.Empty;
         }
 
-        protected virtual IDictionary<string, string> FromJsonString(string jsonString)
+
+        protected virtual IDictionary<string, string> FromQueryString(string queryString)
         {
             var dict = new Dictionary<string, string>();
-
-            if (JsonObject.TryParse(jsonString, out JsonObject json))
-            {
-                foreach (var pair in json)
-                {
-                    dict.Add(pair.Key, pair.Value.GetString());
-                }
-            }
-
+            //var qs = QueryString.Parse(queryString);
+            //foreach (var pair in qs)
+            //{
+            //    dict.Add(pair.Name, pair.Value);
+            //}
             return dict;
         }
 
