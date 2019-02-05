@@ -14,14 +14,13 @@ namespace Samples
 
         public App()
         {
-            Notification.DefaultTitle = "Test Title";
             var btnPermission = new Button {Text = "Request Permission"};
             btnPermission.Command = new Command(async () =>
             {
                 var result = await CrossNotifications.Current.RequestPermission();
                 btnPermission.Text = result ? "Permission Granted" : "Permission Denied";
             });
-
+            
             this.MainPage = new NavigationPage(new ContentPage
             {
                 Title = "Notifications",
@@ -43,6 +42,24 @@ namespace Samples
                         },
                         new Button
                         {
+                            Text = "Send notification",
+                            Command = new Command(() =>
+                            {
+                                CrossNotifications.Current.Send(new Notification
+                                {
+                                    Title = "HELLO!",
+                                    Message = "Hello from the ACR Sample Notification App",
+                                    Vibrate = true,
+                                    Metadata = {
+                                        ["type"] = "hellonow",
+                                        ["pos"] = "1337",
+                                        ["ASD"] = "LoremIpsum"
+                                    }
+                                });
+                            })
+                        },
+                        new Button
+                        {
                             Text = "Press This & Exit App within 10 seconds",
                             Command = new Command(() =>
                                 CrossNotifications.Current.Send(new Notification
@@ -50,7 +67,12 @@ namespace Samples
                                     Title = "HELLO!",
                                     Message = "Hello from the ACR Sample Notification App",
                                     Vibrate = true,
-                                    ScheduledDate = DateTime.Now.AddSeconds(10)
+                                    ScheduledDate = DateTime.Now.AddSeconds(10),
+                                    Metadata = {
+                                        ["type"] = "hello",
+                                        ["pos"] = "42",
+                                        ["ASD"] = "LoremIpsum"
+                                    }
                                 })
                             )
                         },
@@ -70,7 +92,7 @@ namespace Samples
                                     var id = CrossNotifications.Current.Send(new Notification
                                     {
                                         Message = $"Message {i}",
-                                        ScheduledDate = DateTime.Now.AddSeconds(seconds)
+                                        ScheduledDate = DateTime.Now.AddSeconds(seconds),
                                     });
                                     Debug.WriteLine($"Notification ID: {id}");
                                 }
@@ -92,7 +114,13 @@ namespace Samples
                                     var id = CrossNotifications.Current.Send(new Notification
                                     {
                                         Message = $"Message {i}",
-                                        ScheduledDate = DateTime.Now.AddSeconds(seconds)
+                                        ScheduledDate = DateTime.Now.AddSeconds(seconds),
+                                        Metadata =
+                                        {
+                                            ["type"] = "msg_date",
+                                            ["pos"] = "3",
+                                            ["ASD"] = "LoremIpsum"
+                                        }
                                     });
                                     Debug.WriteLine($"Notification ID: {id}");
                                 }

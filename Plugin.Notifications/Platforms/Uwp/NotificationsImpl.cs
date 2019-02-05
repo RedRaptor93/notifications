@@ -8,6 +8,7 @@ using Windows.System.Profile;
 using Windows.UI.Notifications;
 using System.Net;
 using Microsoft.Toolkit.Uwp.Notifications;
+using Windows.Devices.Haptics;
 
 
 namespace Plugin.Notifications
@@ -62,7 +63,7 @@ namespace Plugin.Notifications
 
             var toastContent = new ToastContent
             {
-                Launch = this.ToQueryString(notification.Metadata),
+                Launch = ToQueryString(notification.Metadata),
                 Visual = new ToastVisual
                 {
                     BindingGeneric = new ToastBindingGeneric
@@ -71,12 +72,14 @@ namespace Plugin.Notifications
                         {
                             new AdaptiveText
                             {
-                                Text = notification.Title
+                                Text = notification.Title,
+                                HintStyle = AdaptiveTextStyle.Title
                             },
                             new AdaptiveText
                             {
-                                Text = notification.Message
-                            }
+                                Text = notification.Message,
+                                HintStyle = AdaptiveTextStyle.Body
+                            },
                         }
                     }
                 }
@@ -164,10 +167,13 @@ namespace Plugin.Notifications
         }
 
 
-        public override void Vibrate(int ms)
+        public override async void Vibrate(int ms)
         {
-            var device = Windows.Devices.Haptics.VibrationDevice.GetDefaultAsync().GetResults();
-            if (device.SimpleHapticsController.IsPlayDurationSupported)
+            if (await VibrationDevice.RequestAccessAsync() != VibrationAccessStatus.Allowed)
+                return;
+
+            var device = await VibrationDevice.GetDefaultAsync();
+            if (device != null && device.SimpleHapticsController.IsPlayDurationSupported)
             {
                 var feedback = device.SimpleHapticsController.SupportedFeedback[0];
                 device.SimpleHapticsController.SendHapticFeedbackForDuration(feedback, 1.0, TimeSpan.FromMilliseconds(ms));
@@ -208,6 +214,8 @@ namespace Plugin.Notifications
 
         protected virtual string ToQueryString(IDictionary<string, string> dict)
         {
+            if (dict.Count == 0) return null;
+
             var qs = new System.Text.StringBuilder();
             foreach (var pair in dict)
             {
