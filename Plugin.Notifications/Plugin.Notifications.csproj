@@ -25,7 +25,6 @@
     <ItemGroup>
         <Compile Remove="Platforms\**\*.cs" />
         <None Include="Platforms\**\*.cs" />
-        <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform" Version="6.2.3" />
         <PackageReference Include="MSBuild.Sdk.Extras" Version="1.5.4" PrivateAssets="all" />
     </ItemGroup>
 
