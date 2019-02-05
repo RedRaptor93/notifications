@@ -14,7 +14,7 @@ namespace Samples
 
         public App()
         {
-            Notification.DefaultTitle = "Test Title";
+            //Notification.DefaultTitle = "Test Title";
             var btnPermission = new Button {Text = "Request Permission"};
             btnPermission.Command = new Command(async () =>
             {
