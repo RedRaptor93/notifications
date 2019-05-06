@@ -24,6 +24,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Plugin.Notifications", "Plu
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Samples.Core", "Samples\Samples.Core\Samples.Core.csproj", "{86CED844-9019-4AF5-9467-252A106551D1}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Samples", "Samples", "{B71DA25C-41A2-4A41-8705-EA6A0872BA15}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Ad-Hoc|Any CPU = Ad-Hoc|Any CPU
@@ -372,6 +374,12 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{548B2E19-CE1B-4908-9D08-85C8F037439C} = {B71DA25C-41A2-4A41-8705-EA6A0872BA15}
+		{9D4985B3-5448-442B-9261-45851898001D} = {B71DA25C-41A2-4A41-8705-EA6A0872BA15}
+		{D27B7763-76AE-459A-8BA9-4079E3773E59} = {B71DA25C-41A2-4A41-8705-EA6A0872BA15}
+		{86CED844-9019-4AF5-9467-252A106551D1} = {B71DA25C-41A2-4A41-8705-EA6A0872BA15}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {6FE03B64-B823-4218-A9C9-60E41E959458}
